@@ -50,6 +50,7 @@ export default class AccountScreen extends React.Component {
     try {
       await API_DeleteAccount();
       await AsyncStorage.clear();
+      await SessionService.destroy();
       this.props.navigation.navigate("Auth");
     } catch (e) {
       console.log("Error deleting account", e);

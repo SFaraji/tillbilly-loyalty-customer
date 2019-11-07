@@ -25,7 +25,7 @@ async function openImagePicker(options) {
     const fileType = uriParts[uriParts.length - 1];
 
     if (fileType === "jpeg" || fileType === "jpg" || fileType === "png") {
-      if (_options.onStart) _options.onStart();
+      if (_options.onStart) _options.onStart(result);
       createAsset.call(_options, result.uri, fileType);
     } else {
       Alert.alert(

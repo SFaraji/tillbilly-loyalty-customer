@@ -64,7 +64,9 @@ export default class CardsScreen extends React.Component {
     } else {
       return (
         <View style={styles.dummyPointTile}>
-          <Text style={{ fontSize: 14 }}>No cards added</Text>
+          <Text style={{ fontSize: 14 }}>
+            Scan your store loyalty cards and store them within the App
+          </Text>
         </View>
       );
     }
@@ -73,6 +75,7 @@ export default class CardsScreen extends React.Component {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <StatusBar barStyle="light-content"></StatusBar>
         <View style={styles.body}>{this.renderCards()}</View>
       </ScrollView>
     );

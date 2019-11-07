@@ -5,8 +5,9 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  ToastAndroid,
-  Linking
+  Alert,
+  Linking,
+  Image
 } from "react-native";
 import { API_Signup } from "../../components/Endpoints";
 
@@ -54,7 +55,10 @@ export default class SignupScreen extends React.Component {
         });
       } else {
         if (error.status === 500) {
-          console.log("Internal Server Error");
+          Alert.alert(
+            "Something went wrong",
+            "We encountered some error. Please try again after some time."
+          );
         }
       }
     }
@@ -118,7 +122,7 @@ export default class SignupScreen extends React.Component {
   };
 
   _gotoLogin = () => {
-    this.props.navigation.navigate("Login");
+    this.props.navigation.navigate("EmailLogin");
   };
 
   _handleEmailInput = value => {
@@ -150,42 +154,62 @@ export default class SignupScreen extends React.Component {
 
     return (
       <KeyboardShift>
-        <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.body}>
-            <AppTextInput
-              label="Email"
-              value={inputs.inputEmail}
-              error={errors.inputEmail}
-              onChangeText={this._handleEmailInput}
-              textContentType="emailAddress"
-            />
-            <AppTextInput
-              label="Display Name"
-              value={inputs.displayName}
-              error={errors.displayName}
-              onChangeText={this._handleDisplayNameInput}
-              textContentType="none"
-            />
-            <AppTextInput
-              label="Password"
-              value={inputs.inputPassword_1}
-              error={errors.inputPassword_1}
-              onChangeText={this._handlePasswordInput_1}
-              textContentType="password"
-              secureTextEntry={true}
-            />
-            <AppTextInput
-              label="Confirm Password"
-              value={inputs.inputPassword_2}
-              error={errors.inputPassword_2}
-              onChangeText={this._handlePasswordInput_2}
-              textContentType="password"
-              secureTextEntry={true}
-            />
+        <View style={styles.container}>
+          <ScrollView contentContainerStyle={{ flex: 1 }}>
+            <View style={styles.headerArea}>
+              <Image
+                style={styles.logo}
+                source={require("../../assets/icon.png")}
+              ></Image>
+              <Text style={styles.headerText}>
+                Signup for TillBilly Loyalty Rewards using email
+              </Text>
+              <Text style={styles.headerSubText}>
+                {`Already have an account? `}
+                <Text style={styles.link} onPress={this._gotoLogin}>
+                  Login
+                </Text>
+              </Text>
+            </View>
+            <View style={styles.body}>
+              <AppTextInput
+                label="Email"
+                value={inputs.inputEmail}
+                error={errors.inputEmail}
+                onChangeText={this._handleEmailInput}
+                textContentType="emailAddress"
+              />
+              <AppTextInput
+                label="Display Name"
+                value={inputs.displayName}
+                error={errors.displayName}
+                onChangeText={this._handleDisplayNameInput}
+                textContentType="none"
+              />
+              <AppTextInput
+                label="Password"
+                value={inputs.inputPassword_1}
+                error={errors.inputPassword_1}
+                onChangeText={this._handlePasswordInput_1}
+                textContentType="password"
+                secureTextEntry={true}
+              />
+              <AppTextInput
+                label="Confirm Password"
+                value={inputs.inputPassword_2}
+                error={errors.inputPassword_2}
+                onChangeText={this._handlePasswordInput_2}
+                textContentType="password"
+                secureTextEntry={true}
+              />
+            </View>
+          </ScrollView>
+          <View style={styles.footer}>
             <AppButton
               title="Signup"
               color="rgb(244, 57, 56)"
               onPress={this._submit}
+              noFlex={true}
             />
             <View style={styles.agreeText}>
               <Text>
@@ -209,14 +233,13 @@ export default class SignupScreen extends React.Component {
                 </Text>
               </Text>
             </View>
-            <View style={styles.footer}>
-              <Text>Already have a customer account?</Text>
-              <TouchableOpacity onPress={this._gotoLogin}>
-                <Text style={styles.footerLink}>Login</Text>
-              </TouchableOpacity>
-            </View>
+
+            {/* <Text>Already have a customer account?</Text>
+          <TouchableOpacity onPress={this._gotoLogin}>
+            <Text style={styles.footerLink}>Login</Text>
+          </TouchableOpacity> */}
           </View>
-        </ScrollView>
+        </View>
       </KeyboardShift>
     );
   }
@@ -224,13 +247,37 @@ export default class SignupScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
-    padding: 40,
-    flexGrow: 1,
-    justifyContent: "flex-end"
+    flex: 1
   },
   body: {
-    // justifyContent: "flex-end"
+    flex: 1,
+    padding: 20,
+    justifyContent: "flex-end"
+  },
+  headerArea: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  logo: {
+    width: 64,
+    height: 64
+  },
+  headerText: {
+    fontSize: 18,
+    color: "#333",
+    marginTop: 10
+  },
+  headerSubText: {
+    fontSize: 16,
+    color: "#666",
+    marginTop: 7
+  },
+  footer: {
+    flexShrink: 1,
+    padding: 20,
+    borderTopColor: "rgba(0, 0, 0, 0.07)",
+    borderTopWidth: 1
   },
   agreeText: {
     marginTop: 15
@@ -238,20 +285,13 @@ const styles = StyleSheet.create({
   link: {
     color: "#0099ff"
   },
-  footer: {
-    marginTop: 20,
-    alignItems: "center",
-    borderTopColor: "#e0e0e0",
-    borderTopWidth: 1,
-    paddingTop: 20
-  },
   footerLink: {
     color: "#666"
   }
 });
 
 /**
- * 
+ *
  * isAlphanumeric: function(value) {
       value = value.trim();
       return /\w/.test(value);
@@ -281,5 +321,5 @@ const styles = StyleSheet.create({
         value
       );
     },
- * 
+ *
  */

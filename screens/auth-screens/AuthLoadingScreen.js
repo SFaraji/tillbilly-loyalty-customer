@@ -13,7 +13,7 @@ export default class AuthLoadingScreen extends React.Component {
 
     if (sessionReady.exists) {
       this.props.navigation.navigate("Home");
-      // this.props.navigation.navigate("About");
+      // this.props.navigation.navigate("Profile");
     } else {
       this.props.navigation.navigate("Auth");
     }

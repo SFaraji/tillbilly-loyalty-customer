@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  ToastAndroid
-} from "react-native";
+import { ScrollView, View, StyleSheet, Text, Image, Alert } from "react-native";
 
 import AppTextInput from "../../components/AppTextInput";
 import AppButton from "../../components/AppButton";
@@ -38,20 +31,27 @@ export default class LoginScreen extends React.Component {
 
       // #TODO Handle signup errors
 
+      let title = "An error occurred";
+      let message;
+
       if (error.status) {
-        let m =
-          "Status: " +
-          error.status +
-          "\n" +
-          "Message: " +
-          (error.message || error.statusText);
-        ToastAndroid.show(m, ToastAndroid.LONG);
+        if (error.status === 401) {
+          title = "Invalid credentials";
+          message = "Your email or password is incorrect.";
+        } else {
+          message = "Error code: " + error.status;
+        }
+      } else {
+        message =
+          "An unknown error occurred. Please contact support if this problem persists.";
       }
+
+      Alert.alert(title, message);
     }
   };
 
   _gotoSignup = () => {
-    this.props.navigation.navigate("Signup");
+    this.props.navigation.navigate("Login");
   };
 
   _handleEmailInput = value => {
@@ -96,36 +96,48 @@ export default class LoginScreen extends React.Component {
 
     return (
       <KeyboardShift>
-        <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.body}>
-            <AppTextInput
-              label="Email"
-              value={inputs.email}
-              error={errors.email}
-              onChangeText={this._handleEmailInput}
-              textContentType="emailAddress"
-            />
-            <AppTextInput
-              label="Password"
-              value={inputs.password}
-              error={errors.password}
-              onChangeText={this._handlePasswordInput}
-              textContentType="password"
-              secureTextEntry={true}
-            />
+        <View style={styles.container}>
+          <ScrollView contentContainerStyle={{ flex: 1 }}>
+            <View style={styles.headerArea}>
+              <Image
+                style={styles.logo}
+                source={require("../../assets/icon.png")}
+              ></Image>
+              <Text style={styles.headerText}>Login to your account</Text>
+              <Text style={styles.headerSubText}>
+                {`Don't have an account? `}
+                <Text style={styles.link} onPress={this._gotoSignup}>
+                  Create one
+                </Text>
+              </Text>
+            </View>
+            <View style={styles.body}>
+              <AppTextInput
+                label="Email"
+                value={inputs.email}
+                error={errors.email}
+                onChangeText={this._handleEmailInput}
+                textContentType="emailAddress"
+              />
+              <AppTextInput
+                label="Password"
+                value={inputs.password}
+                error={errors.password}
+                onChangeText={this._handlePasswordInput}
+                textContentType="password"
+                secureTextEntry={true}
+              />
+            </View>
+          </ScrollView>
+          <View style={styles.footer}>
             <AppButton
               title="Login"
               color="rgb(244, 57, 56)"
               onPress={this._submit}
+              noFlex={true}
             />
-            <View style={styles.footer}>
-              <Text>Don't have a customer account?</Text>
-              <TouchableOpacity onPress={this._gotoSignup}>
-                <Text style={styles.footerLink}>Create one now!</Text>
-              </TouchableOpacity>
-            </View>
           </View>
-        </ScrollView>
+        </View>
       </KeyboardShift>
     );
   }
@@ -133,20 +145,40 @@ export default class LoginScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
-    padding: 40,
-    flexGrow: 1,
-    justifyContent: "flex-end"
+    flex: 1
   },
   body: {
-    // justifyContent: "flex-end"
+    flex: 1,
+    padding: 20,
+    justifyContent: "flex-end"
+  },
+  headerArea: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  logo: {
+    width: 64,
+    height: 64
+  },
+  headerText: {
+    fontSize: 18,
+    color: "#333",
+    marginTop: 10
+  },
+  headerSubText: {
+    fontSize: 16,
+    color: "#666",
+    marginTop: 7
   },
   footer: {
-    marginTop: 20,
-    alignItems: "center",
-    borderTopColor: "#e0e0e0",
-    borderTopWidth: 1,
-    paddingTop: 20
+    padding: 20
+  },
+  agreeText: {
+    marginTop: 15
+  },
+  link: {
+    color: "#0099ff"
   },
   footerLink: {
     color: "#666"

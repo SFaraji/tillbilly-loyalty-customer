@@ -54,16 +54,27 @@ export default class PasswordScreen extends React.Component {
       console.log("Password update error", error);
 
       // #TODO Handle signup errors
+      // if (error.status) {
+      //   let m =
+      //     "Status: " +
+      //     error.status +
+      //     "\n" +
+      //     "Message: " +
+      //     (error.message || error.statusText);
+      //   ToastAndroid.show(m, ToastAndroid.LONG);
+      // }
+
+      let title = "An error occurred";
+      let message;
 
       if (error.status) {
-        let m =
-          "Status: " +
-          error.status +
-          "\n" +
-          "Message: " +
-          (error.message || error.statusText);
-        ToastAndroid.show(m, ToastAndroid.LONG);
+        message = "Error code: " + error.status;
+      } else {
+        message =
+          "An unknown error occurred. Please contact support if this problem persists.";
       }
+
+      Alert.alert(title, message);
     }
   };
 

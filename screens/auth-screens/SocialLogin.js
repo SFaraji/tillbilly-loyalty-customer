@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ImageBackground,
+  Image,
   View,
   StyleSheet,
   Text,
@@ -32,8 +33,8 @@ const getSocialIcon = provider => {
 };
 
 export default class SocialScreen extends React.Component {
-  _handleEmailLogin = () => {
-    this.props.navigation.navigate("EmailLogin");
+  _handleEmailSignup = () => {
+    this.props.navigation.navigate("Signup");
   };
 
   _handleGoogleLogin = () => {
@@ -56,20 +57,29 @@ export default class SocialScreen extends React.Component {
       >
         <StatusBar barStyle="dark-content" />
         <View style={styles.body}>
-          <SocialButton
-            provider="facebook"
-            title="Continue with Facebook"
-            onPress={this._handleFacebookLogin}
-          />
-          <SocialButton
-            provider="google"
-            title="Continue with Google"
-            onPress={this._handleGoogleLogin}
-          />
-          <View style={styles.footer}>
-            <TouchableOpacity onPress={this._handleEmailLogin}>
-              <Text style={styles.footerLink}>or use email</Text>
-            </TouchableOpacity>
+          {/* <View style={styles.logoArea}>
+            <Image
+              style={styles.logoImage}
+              source={require("../../assets/icon.png")}
+            ></Image>
+            <Text style={styles.logoText}>TillBilly Rewards</Text>
+          </View> */}
+          <View style={styles.buttonsArea}>
+            <SocialButton
+              provider="facebook"
+              title="Continue with Facebook"
+              onPress={this._handleFacebookLogin}
+            />
+            <SocialButton
+              provider="google"
+              title="Continue with Google"
+              onPress={this._handleGoogleLogin}
+            />
+            <View style={styles.footer}>
+              <TouchableOpacity onPress={this._handleEmailSignup}>
+                <Text style={styles.footerLink}>or use email</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ImageBackground>
@@ -82,11 +92,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 40,
     paddingBottom: 15,
-    flex: 1,
-    justifyContent: "flex-end"
+    flex: 1
   },
   body: {
-    marginBottom: 10
+    flex: 1,
+    marginBottom: 10,
+    justifyContent: "flex-end"
+  },
+  logoArea: {
+    flex: 1,
+    justifyContent: "center",
+    alignContent: "center",
+    alignItems: "center"
+  },
+  logoImage: {
+    width: 64,
+    height: 64
+  },
+  logoText: {
+    fontSize: 16,
+    color: "#666"
+  },
+  buttonsArea: {
+    flex: 0
   },
   socialButton: {
     borderRadius: 15,
@@ -118,6 +146,9 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   footerLink: {
-    color: "#fff"
+    color: "#fff",
+    fontSize: 16,
+    textDecorationLine: "underline",
+    textDecorationStyle: "dotted"
   }
 });

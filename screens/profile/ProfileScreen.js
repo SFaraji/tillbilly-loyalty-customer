@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  ToastAndroid,
   ActivityIndicator,
   Alert
 } from "react-native";
@@ -21,40 +20,6 @@ import KeyboardShift from "../../components/KeyboardShift";
 import { API_UpdateProfile } from "../../components/Endpoints";
 
 export default class ProfileScreen extends React.Component {
-  // constructor(props){
-  //   super(props);
-
-  //   this.state = {
-  //     image: null,
-  //     user: null,
-  //     userData: {
-  //       firstName: "",
-  //       lastName: "",
-  //       displayName: ""
-  //     },
-  //     inputs: {
-  //       firstName: {
-  //         value: "",
-  //         type: "name"
-  //       },
-  //       lastName: {
-  //         value: "",
-  //         type: "name"
-  //       },
-  //       displayName: {
-  //         value: "",
-  //         type: "displayName"
-  //       },
-  //     },
-  //     displayNameError: null,
-  //     imageUploading: false
-  //   }
-
-  //   this.onInputChange = validationService.onInputChange.bind(this);
-  //   this.getFormValidation = validationService.getFormValidation.bind(this);
-  //   this.submit = this.submit.bind(this);
-  // }
-
   static navigationOptions = {
     title: "Profile"
   };
@@ -68,7 +33,8 @@ export default class ProfileScreen extends React.Component {
       displayName: ""
     },
     displayNameError: null,
-    imageUploading: false
+    imageUploading: false,
+    uploadUri: null
   };
 
   async componentDidMount() {
@@ -89,7 +55,8 @@ export default class ProfileScreen extends React.Component {
 
   handleAvatarPress = async () => {
     ImageUploader.upload({
-      onStart: () => this.setState({ imageUploading: true }),
+      onStart: result =>
+        this.setState({ imageUploading: true, uploadUri: result.uri }),
       onError: () => this.setState({ imageUploading: false }),
       onComplete: () => this.setState({ imageUploading: false })
     });
@@ -114,16 +81,25 @@ export default class ProfileScreen extends React.Component {
       console.log("User update error", error);
 
       // #TODO Handle signup errors
+      // let m =
+      // "Status: " +
+      // error.status +
+      // "\n" +
+      // "Message: " +
+      // (error.message || error.statusText);
+      // ToastAndroid.show(m, ToastAndroid.LONG);
+
+      let title = "An error occurred";
+      let message;
 
       if (error.status) {
-        let m =
-          "Status: " +
-          error.status +
-          "\n" +
-          "Message: " +
-          (error.message || error.statusText);
-        ToastAndroid.show(m, ToastAndroid.LONG);
+        message = "Error code: " + error.status;
+      } else {
+        message =
+          "An unknown error occurred. Please contact support if this problem persists.";
       }
+
+      Alert.alert(title, message);
     }
   };
 
@@ -144,9 +120,11 @@ export default class ProfileScreen extends React.Component {
   };
 
   getAvatar = () => {
-    const { image } = this.state;
+    const { image, uploadUri } = this.state;
 
-    if (image) {
+    if (uploadUri) {
+      return { uri: uploadUri };
+    } else if (image) {
       return { uri: image };
     } else {
       return require("../../assets/images/temp-avatar.png");
@@ -162,14 +140,18 @@ export default class ProfileScreen extends React.Component {
         <View style={styles.container}>
           <ScrollView>
             <View style={styles.subheader}>
-              <View style={styles.avatarFrame}>
-                <Image style={styles.avatarImage} source={this.getAvatar()} />
-              </View>
-              <TouchableOpacity
-                onPress={this.handleAvatarPress}
-                style={styles.avatarButton}
-              >
-                <Text>Tap to change avatar</Text>
+              <TouchableOpacity onPress={this.handleAvatarPress}>
+                <View style={styles.subheaderinner}>
+                  <View style={styles.avatarFrame}>
+                    <Image
+                      style={styles.avatarImage}
+                      source={this.getAvatar()}
+                    />
+                  </View>
+                  <View style={styles.avatarButton}>
+                    <Text>Tap to change profile picture</Text>
+                  </View>
+                </View>
               </TouchableOpacity>
               {imageUploading && (
                 <View style={styles.avatarLoading}>
@@ -232,10 +214,12 @@ const styles = StyleSheet.create({
     padding: 20
   },
   subheader: {
-    flexDirection: "column",
-    // padding: 20,
     backgroundColor: "rgb(245, 243, 251)",
     alignItems: "center"
+  },
+  subheaderinner: {
+    alignItems: "center",
+    justifyContent: "center"
   },
   avatarFrame: {
     overflow: "hidden",

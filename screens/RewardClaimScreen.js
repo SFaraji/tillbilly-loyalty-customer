@@ -62,9 +62,6 @@ export default class RewardClaimScreen extends React.Component {
             </Text>
           </View>
         </View>
-        <Text style={styles.merchantMessage}>
-          Please show this screen to the merchant.
-        </Text>
       </View>
     );
   }

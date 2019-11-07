@@ -10,11 +10,14 @@ import {
   RefreshControl
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import QRCode from "react-native-qrcode";
+
 import SessionService from "../../services/SessionService";
 import Rewards from "../../data-store/RewardsStore";
 import UpcomingRewards from "../../data-store/UpcomingRewardStore";
 
 import RewardTile from "../../components/RewardTile";
+import { API_CreateTransaction } from "../../components/Endpoints";
 
 export default class HomeScreen extends React.Component {
   state = {
@@ -69,13 +72,38 @@ export default class HomeScreen extends React.Component {
   };
 
   renderQrButton = () => {
-    return (
-      <TouchableHighlight onPress={this.handleQRPress}>
-        <View style={styles.qrbutton}>
-          <AntDesign name="qrcode" size={128} color="#fff"></AntDesign>
-        </View>
-      </TouchableHighlight>
-    );
+    const { user } = this.state;
+
+    if (!user) {
+      return (
+        <TouchableHighlight onPress={this.handleQRPress}>
+          <View style={styles.qrbutton}>
+            <AntDesign name="qrcode" size={128} color="#fff"></AntDesign>
+          </View>
+        </TouchableHighlight>
+      );
+    } else {
+      const qrString =
+        "tbloyalty://" +
+        JSON.stringify({
+          qrId: user.qrId
+        });
+
+      return (
+        <TouchableHighlight onPress={this.handleQRPress}>
+          <View style={styles.qrbutton}>
+            <View style={{ flex: 1, overflow: "hidden" }}>
+              <QRCode
+                value={qrString}
+                size={128}
+                bgColor="#fff"
+                fgColor="#4ab8e1"
+              ></QRCode>
+            </View>
+          </View>
+        </TouchableHighlight>
+      );
+    }
   };
 
   renderBgGraphic = () => {
@@ -111,13 +139,7 @@ export default class HomeScreen extends React.Component {
   renderDisplayName = () => {
     const { user } = this.state;
     if (user) {
-      let name = user.displayName;
-
-      if (user.firstName) {
-        name = user.firstName;
-      }
-
-      return name;
+      return user.displayName;
     } else {
       return "Loading";
     }
@@ -137,7 +159,7 @@ export default class HomeScreen extends React.Component {
             });
           }}
           onRedeem={_reward => {
-            console.log("Redeem", _reward);
+            this.handleRedeemPress(_reward);
           }}
         />
       ));
@@ -153,6 +175,26 @@ export default class HomeScreen extends React.Component {
           <Text>Loading Rewards</Text>
         </View>
       );
+    }
+  };
+
+  handleRedeemPress = reward => {
+    this.props.navigation.navigate("ConfirmationModal", {
+      message:
+        "Please let the merchant click confirm button. Do not click yourself.",
+      onConfirm: () => this.confirmRedeemPress(reward)
+    });
+  };
+
+  confirmRedeemPress = async reward => {
+    try {
+      await API_CreateTransaction(reward);
+      this.updateRewards();
+      this.props.navigation.navigate("RewardClaim", {
+        reward: reward
+      });
+    } catch (error) {
+      console.log("Redeem error", error);
     }
   };
 
@@ -178,7 +220,7 @@ export default class HomeScreen extends React.Component {
   };
 
   render() {
-    // console.log(this.state);
+    // console.log("Render State", this.state);
 
     return (
       <ScrollView
@@ -249,7 +291,8 @@ const styles = StyleSheet.create({
   qrbutton: {
     backgroundColor: "#4ab8e1",
     padding: 15,
-    borderRadius: 40
+    borderRadius: 40,
+    overflow: "hidden"
   },
   // Bottom section styles
   bottomSection: {

@@ -39,6 +39,26 @@ export default class RewardDetailScreen extends React.Component {
     });
   };
 
+  handleRedeemPress = reward => {
+    this.props.navigation.navigate("ConfirmationModal", {
+      message:
+        "Please let the merchant click confirm button. Do not click yourself.",
+      onConfirm: () => this.confirmRedeemPress()
+    });
+  };
+
+  confirmRedeemPress = async () => {
+    const { reward } = this.state;
+    try {
+      await API_CreateTransaction(reward);
+      this.props.navigation.replace("RewardClaim", {
+        reward: reward
+      });
+    } catch (error) {
+      console.log("Redeem error", error);
+    }
+  };
+
   maybeRenderRedeem = () => {
     let { activePoints, pointsRequired } = this.state.reward;
     activePoints = parseInt(activePoints);
@@ -48,7 +68,7 @@ export default class RewardDetailScreen extends React.Component {
       return (
         <View style={styles.actionView}>
           {Platform.OS === "ios" ? (
-            <TouchableOpacity onPress={this.redeemReward}>
+            <TouchableOpacity onPress={this.handleRedeemPress}>
               <View style={styles.buttonView}>
                 <Text style={styles.buttonText}>Redeem</Text>
               </View>
@@ -57,13 +77,24 @@ export default class RewardDetailScreen extends React.Component {
             <TouchableNativeFeedback
               delayPressIn={0.5}
               delayPressOut={0.5}
-              onPress={this.redeemReward}
+              onPress={this.handleRedeemPress}
             >
               <View style={styles.buttonView}>
                 <Text style={styles.buttonText}>Redeem</Text>
               </View>
             </TouchableNativeFeedback>
           )}
+          <Text
+            style={{
+              textAlign: "center",
+              fontSize: 14,
+              color: "#666",
+              marginTop: 5
+            }}
+          >
+            Please show this screen to the merchant. Do not click redeem
+            yourself
+          </Text>
         </View>
       );
     } else {

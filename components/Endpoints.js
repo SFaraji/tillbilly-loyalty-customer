@@ -97,8 +97,7 @@ export const API_GetCustomer = async (userId, authToken) => {
 };
 
 export const API_GetRewards = async queryParams => {
-  const path =
-    API.apiBase + "/rewards?expand=true&" + serializeQuery(queryParams);
+  const path = API.apiBase + "/rewards?" + serializeQuery(queryParams);
 
   try {
     let response = await fetch(path, {
@@ -150,6 +149,29 @@ export const API_GetTransactions = async queryParams => {
     let response = await fetch(path, {
       method: "GET",
       headers: getAuthHeaders()
+    });
+
+    let responseJson = await response.json();
+
+    if (response.status && response.status >= 200 && response.status < 300) {
+      return Promise.resolve(responseJson);
+    }
+
+    return Promise.reject(responseJson || response);
+  } catch (error) {
+    console.log("Endpoint.js error (get transactions): ", error);
+    return Promise.reject(error);
+  }
+};
+
+export const API_CreateTransaction = async reward => {
+  const path = API.apiBase + "/loyalties";
+  console.log("Redeeming", reward);
+  try {
+    let response = await fetch(path, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ rewardId: reward.id + "" })
     });
 
     let responseJson = await response.json();
